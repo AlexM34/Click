@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Click:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Click_jar</output-path>
+    <root id="archive" name="Click.jar">
+      <element id="module-output" name="Click" />
+    </root>
+  </artifact>
+</component>

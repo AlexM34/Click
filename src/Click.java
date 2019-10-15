@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -8,6 +9,8 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Random;
 
 public class Click {
@@ -16,6 +19,9 @@ public class Click {
 
     private static Color[] COLORS = {Color.BLUE, Color.CYAN, Color.ORANGE, Color.RED, Color.YELLOW, Color.GREEN,
             Color.PINK, Color.MAGENTA, Color.GRAY, Color.WHITE};
+
+    private static String[] IMAGES = {"bus", "duster", "megan", "plane", "tractor", "train", "tram", "trolley",
+            "tube", "yacht"};
 
     private JFrame frame = new JFrame("Click");
     private static int width;
@@ -34,18 +40,7 @@ public class Click {
         width = frame.getWidth();
         height = frame.getHeight();
 
-        ImageIcon image = new ImageIcon("images/tram.jpg");
-        Image image2 = image.getImage();
-        Image newimg = image2.getScaledInstance(imageWidth, imageHeight,  Image.SCALE_SMOOTH);
-        image = new ImageIcon(newimg);
-
-        System.out.println("tram coming!");
-        JLabel label = new JLabel();
-        label.setIcon(image);
-        label.setSize(imageWidth, imageHeight);
-        frame.getContentPane().add(label);
-
-//        initialise();
+        initialise();
     }
 
     private void initialise() {
@@ -55,8 +50,14 @@ public class Click {
         frame.getContentPane().setBackground(COLORS[random.nextInt(10)]);
         final int value = random.nextInt(10);
 
-        for (int i = 0; i < 3; i++) {
-            add(random.nextInt(4 * width / 5), random.nextInt(4 * height / 5), value);
+        if (random.nextInt(4) == 0) {
+            for (int i = 0; i < 5; i++) {
+                addCharacter(random.nextInt(4 * width / 5), random.nextInt(4 * height / 5), value);
+            }
+        } else {
+            for (int i = 0; i < 5; i++) {
+                addImage(random.nextInt(4 * width / 5), random.nextInt(4 * height / 5), value);
+            }
         }
 
         SwingUtilities.updateComponentTreeUI(frame);
@@ -65,13 +66,37 @@ public class Click {
         frame.repaint();
     }
 
-    private void add(final int x, final int y, final int value) {
+    private void addCharacter(final int x, final int y, final int value) {
         System.out.println(x + " " + y + " " + value);
         JLabel label = new JLabel(String.valueOf(value), JLabel.CENTER);
         label.setFont(new Font("Times New Roman", Font.BOLD, 200));
         label.setSize(200, 200);
         label.setLocation(x, y);
 
+        addListener(label);
+    }
+
+    private void addImage(final int x, final int y, final int value) {
+        System.out.println(x + " " + y + " " + value);
+
+        try {
+            BufferedImage image = ImageIO.read(getClass().getResource(IMAGES[value] + ".jpg"));
+            Image scaledInstance = image.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+            ImageIcon icon = new ImageIcon(scaledInstance);
+
+            JLabel label = new JLabel();
+            label.setIcon(icon);
+            label.setSize(imageWidth, imageHeight);
+            frame.getContentPane().add(label);
+            label.setLocation(x, y);
+            addListener(label);
+
+        } catch (IOException e) {
+            System.out.println("Could not load image " + IMAGES[value]);
+        }
+    }
+
+    private void addListener(final JLabel label) {
         label.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(final MouseEvent e) {
