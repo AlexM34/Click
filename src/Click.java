@@ -1,7 +1,11 @@
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import java.awt.Color;
@@ -11,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Random;
 
 public class Click {
@@ -26,8 +31,8 @@ public class Click {
     private JFrame frame = new JFrame("Click");
     private static int width;
     private static int height;
-    private static int imageWidth = 320;
-    private static int imageHeight = 200;
+    private static int imageWidth = 250;
+    private static int imageHeight = 160;
     private static int objects = 0;
 
     private Click() {
@@ -40,6 +45,7 @@ public class Click {
         width = frame.getWidth();
         height = frame.getHeight();
 
+        playMusic();
         initialise();
     }
 
@@ -50,7 +56,7 @@ public class Click {
         frame.getContentPane().setBackground(COLORS[random.nextInt(10)]);
         final int value = random.nextInt(10);
 
-        if (random.nextInt(4) == 0) {
+        if (random.nextInt(10) == 0) {
             for (int i = 0; i < 5; i++) {
                 addCharacter(random.nextInt(4 * width / 5), random.nextInt(4 * height / 5), value);
             }
@@ -64,6 +70,21 @@ public class Click {
         frame.invalidate();
         frame.validate();
         frame.repaint();
+    }
+
+    private void playMusic() {
+        final String fileName = "Ram Sam Sam.wav";
+        try {
+            final URL url = getClass().getResource(fileName);
+            final AudioInputStream audioStream = AudioSystem.getAudioInputStream(url);
+
+            final Clip clip = AudioSystem.getClip();
+            clip.open(audioStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+
+        } catch (final Exception e) {
+            JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
+        }
     }
 
     private void addCharacter(final int x, final int y, final int value) {
@@ -91,7 +112,7 @@ public class Click {
             label.setLocation(x, y);
             addListener(label);
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
             System.out.println("Could not load image " + IMAGES[value]);
         }
     }
