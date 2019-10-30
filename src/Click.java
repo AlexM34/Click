@@ -14,7 +14,6 @@ import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
 
@@ -25,15 +24,24 @@ public class Click {
     private static Color[] COLORS = {Color.BLUE, Color.CYAN, Color.ORANGE, Color.RED, Color.YELLOW, Color.GREEN,
             Color.PINK, Color.MAGENTA, Color.GRAY, Color.WHITE};
 
-    private static String[] IMAGES = {"bus", "duster", "megan", "plane", "tractor", "train", "tram", "trolley",
-            "tube", "yacht"};
+    private static String[] AUDIO = {"Choco", "Ponga", "Ram Sam Sam", "Waka Waka"};
+
+    private static String[] IMAGES = {"bus", "duster", "megane", "plane", "tractor", "train", "tram", "trolley",
+            "tube", "yacht", "school", "alf1", "alf2", "bee", "bike", "bottle", "chess",
+            "christmas tree", "cook", "corn", "crown", "dog husky", "dog2", "elephant", "fish", "fish1", "hen",
+            "horse", "house", "jacket", "mcdonalds", "mcdonalds1", "ndk", "phone", "policeman", "rooster",
+            "santa claus", "sea", "shoes", "shrimp", "smile", "snow", "snowflake", "snowman", "sydney",
+            "train1", "t-shirt", "tv", "umbrella", "worker"};
 
     private JFrame frame = new JFrame("Click");
+    private Clip clip;
+
     private static int width;
     private static int height;
     private static int imageWidth = 250;
     private static int imageHeight = 160;
     private static int objects = 0;
+    private static int song = -1;
 
     private Click() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,7 +53,6 @@ public class Click {
         width = frame.getWidth();
         height = frame.getHeight();
 
-        playMusic();
         initialise();
     }
 
@@ -54,15 +61,14 @@ public class Click {
 
         System.out.println(frame.getComponents().length);
         frame.getContentPane().setBackground(COLORS[random.nextInt(10)]);
-        final int value = random.nextInt(10);
 
-        if (random.nextInt(10) == 0) {
-            for (int i = 0; i < 5; i++) {
-                addCharacter(random.nextInt(4 * width / 5), random.nextInt(4 * height / 5), value);
-            }
-        } else {
-            for (int i = 0; i < 5; i++) {
-                addImage(random.nextInt(4 * width / 5), random.nextInt(4 * height / 5), value);
+        for (int i = 0; i < 20; i++) {
+            if (random.nextInt(20) == 0) {
+                addCharacter(random.nextInt(4 * width / 5), random.nextInt(4 * height / 5),
+                        random.nextInt(10));
+            } else {
+                addImage(random.nextInt(4 * width / 5), random.nextInt(4 * height / 5),
+                        random.nextInt(IMAGES.length));
             }
         }
 
@@ -70,17 +76,26 @@ public class Click {
         frame.invalidate();
         frame.validate();
         frame.repaint();
+        playMusic();
     }
 
     private void playMusic() {
-        final String fileName = "Ram Sam Sam.wav";
+        int r;
+        do {
+            r = new Random().nextInt(AUDIO.length);
+        } while (r == song);
+
+        song = r;
+        final String fileName = AUDIO[song] + ".wav";
         try {
             final URL url = getClass().getResource(fileName);
             final AudioInputStream audioStream = AudioSystem.getAudioInputStream(url);
 
-            final Clip clip = AudioSystem.getClip();
+            if (clip != null) clip.close();
+            clip = AudioSystem.getClip();
             clip.open(audioStream);
-            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.setFramePosition(clip.getFrameLength() / 4);
+            clip.start();
 
         } catch (final Exception e) {
             JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
@@ -112,7 +127,7 @@ public class Click {
             label.setLocation(x, y);
             addListener(label);
 
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             System.out.println("Could not load image " + IMAGES[value]);
         }
     }
